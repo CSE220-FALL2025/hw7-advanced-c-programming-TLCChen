@@ -391,6 +391,7 @@ matrix_sf *evaluate_expr_sf(char name, char *expr, bst_sf *root)
     matrix_sf **stackP = stack;
     char *sptr = str;
     sptr = infix2postfix_sf(expr);
+    char *delete = sptr;
 
     while (*sptr != '\0')
     {
@@ -427,11 +428,11 @@ matrix_sf *evaluate_expr_sf(char name, char *expr, bst_sf *root)
     while (*stackP > stack)
     {
         free(stackP);
-        free(stack);
-
-        return result;
-        return NULL;
+        stackP--;
     }
+    free(delete);
+    return result;
+    return NULL;
 }
 
 matrix_sf *execute_script_sf(char *filename)
@@ -445,7 +446,7 @@ matrix_sf *execute_script_sf(char *filename)
     char *line = NULL;
     size_t max_line_size = MAX_LINE_LEN;
 
-    while (getline(&line, &max_line_size, filename) != -1)
+    while (getline(&line, &max_line_size, input) != -1)
     {
         if (*line == '\0' || *line == '\n')
         {
@@ -473,7 +474,8 @@ matrix_sf *execute_script_sf(char *filename)
     }
 
     free(line);
-    fclose(filename);
+    free_bst_sf(root);
+    fclose(input);
 
     return result;
 
@@ -506,5 +508,5 @@ void print_matrix_sf(matrix_sf *mat)
         if (i < mat->num_rows * mat->num_cols - 1)
             printf(" ");
     }
-    printf("\n");
+    printf("\r\n");
 }
